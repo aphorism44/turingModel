@@ -14,7 +14,7 @@ const { TMRule, TuringMachine } = require('./tmModule.js');
 //6 - "REJECT"
 
 class WBInstruction {
-  constructor(instructionNumber = 0, instructionType = 'Accept'
+  constructor(instructionNumber = 0, instructionType = 'ACCEPT'
     , move = '', s = '', n = 0) {
       this.number = instructionNumber;
       this.command = instructionType;
