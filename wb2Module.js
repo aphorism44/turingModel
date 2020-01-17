@@ -11,14 +11,13 @@ const { WBInstruction, WBLanguage } = require('./wbModule.js');
 
 class WB2Instruction {
   constructor(instructionNumber = 0, instructionType = 'ACCEPT'
-    , move = '', s = '', n = 0, moveto = new Set(), looped=false) {
+    , move = '', s = '', n = null, moveto = new Set()) {
       this.number = instructionNumber;
       this.command = instructionType;
       this.movement = move;
       this.s = s;
       this.n = n;
       this.moveto = moveto; //set, only used in 2 instructions
-      this.looped = looped; //ditto
     }
 }
 
@@ -45,7 +44,7 @@ class WB2Language {
     this.startHeadPosition = startHeadPosition;
     this.startInstructionNumber = startInstructionNumber;
     this.added = 0; //we need to account for additional instructions at a given point
-    this.instMap = new Map(); //value of added is different at different instructions
+    this.addMap = new Map(); //original instruction value -> new instruction values
   }
 
   getOutput() {
@@ -78,51 +77,53 @@ class WB2Language {
       switch (instruction.command) {
         case 'MOVE':
           wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, 'MOVE', instruction.movement));
+          this.addMap.set(n, n + this.added);
           break;
         case 'WRITE':
           wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, 'WRITE', null, instruction.s));
+          this.addMap.set(n, n + this.added);
           break;
         case 'GOTO':
           wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, 'GOTO', null, null, instruction.n));
+          this.addMap.set(n, n + this.added);
           break;
         case 'IFGOTO':
           wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, 'IFGOTO', null, instruction.s, instruction.n));
+          this.addMap.set(n, n + this.added);
           break;
         case 'ACCEPT':
           wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, 'ACCEPT'));
+          this.addMap.set(n, n + this.added);
           break;
         case 'REJECT':
           wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, 'REJECT'));
+          this.addMap.set(n, n + this.added);
           break;
         case 'MOVELEFTTO': case 'MOVERIGHTTO':
           let movement = 'L';
           if (instruction.command == 'MOVERIGHTTO')
             movement = 'R';
-          let currentInstNum = n + this.added;
           let stopSet = instruction.moveto;
-          let moveInst = currentInstNum + stopSet.size + 2;
+          let startN = n + this.added;
           for (let s of stopSet) {
-            wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, "IFGOTO", null, s, moveInst, null, true));
+            wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, "IFGOTO", null, s, n + this.added + stopSet.size + 2));
             this.added++;
           }
           wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, "MOVE", movement));
           this.added++;
-          wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, "GOTO", null, null, currentInstNum, null, true));
+          wbInstructionMap.set(n + this.added, new WBInstruction(n + this.added, "GOTO", null, null, startN));
           break;
       }
-      //need to map added value at every given point
-      this.instMap.set(n + this.added, n);
+
     }
     //GOTO and IFGOTO must have their n-value adjusted with the instMap
-    console.log(this.instMap);
-    for (let [key, value] of wbInstructionMap) {
-      if (!value.looped && (value.command == 'GOTO' || value.command == 'IFGOTO')) {
-        console.log(value.n);
-        let newMap = this.instMap.get(value.n);
-        console.log(newMap);
-        if (!value.looped)
-          value.n = newMap;
-      }
+    //but not those already added by MOVELEFTTO and MOVERIGHTTO
+    for (let [key, value] of this.addMap) {
+      let inst = wbInstructionMap.get(value);
+      let oldGotoN = inst.n;
+      let newGotoN = this.addMap.get(oldGotoN);
+      inst.n = newGotoN;
+      wbInstructionMap.set(inst.number, inst);
     }
 
     return wbInstructionMap;

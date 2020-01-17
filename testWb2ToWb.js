@@ -53,17 +53,16 @@ let wb2Palin6 = new WB2Language(tape6, 0, 0, wb2RuleMap, WB2Alpha);
 
 //now get the equivalent WB rule set
 let wbPalin1 = wb2Palin1.getWB();
-//let wbPalin2 = wb2Palin2.getWB();
-//let wbPalin3 = wb2Palin3.getWB();
-//let wbPalin4 = wb2Palin4.getWB();
-//let wbPalin5 = wb2Palin5.getWB();
-//let wbPalin6 = wb2Palin6.getWB();
+let wbPalin2 = wb2Palin2.getWB();
+let wbPalin3 = wb2Palin3.getWB();
+let wbPalin4 = wb2Palin4.getWB();
+let wbPalin5 = wb2Palin5.getWB();
+let wbPalin6 = wb2Palin6.getWB();
 
-console.log(wbPalin1);
+//console.log(wbPalin1);
 
 //test WB
-//wbPalin1.run(true); //accept
-/*
+wbPalin1.run(); //accept
 wbPalin2.run(); //reject
 wbPalin3.run(); //accept
 wbPalin4.run(); //reject
@@ -85,4 +84,3 @@ tmPalin3.run(); //accept
 tmPalin4.run(); //reject
 tmPalin5.run(); //reject
 tmPalin6.run(); //reject
-*/
