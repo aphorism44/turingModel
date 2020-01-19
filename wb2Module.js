@@ -2,12 +2,17 @@ const { WBInstruction, WBLanguage } = require('./wbModule.js');
 
 //this is the Wang-B2 language
 //adds features to Wang-B language, namely:
-// 7 - "RIGHTTO" move right until you hit symbol s
-// 8 -  "LEFTTO" move left until you hit symbol s
+// 7 - "MOVERIGHTTO" move right until you hit symbol s
+// 8 -  "MOVELEFTTO" move left until you hit symbol s
 
 //NOTE - every instriction must compile to WB, not TM
 //NOTE - from now on, we'll just compile down, not make
 // the extra languages directly runnable
+
+//WARNING - the re-numbering of instuction.n during Wang-B conversion
+//is not complete - keep finding edge cases; so far it works on input,
+//but a provable solution has yet to be written (the lecture simple said
+//to "renumber accordingly", as if it were that simple!!!)
 
 class WB2Instruction {
   constructor(instructionNumber = 0, instructionType = 'ACCEPT'
