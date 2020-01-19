@@ -11,7 +11,7 @@ const { WBInstruction, WBLanguage } = require('./wbModule.js');
 
 class WB2Instruction {
   constructor(instructionNumber = 0, instructionType = 'ACCEPT'
-    , move = '', s = '', n = null, moveto = new Set()) {
+    , move = '', s = '', n = 0, moveto = new Set()) {
       this.number = instructionNumber;
       this.command = instructionType;
       this.movement = move;
@@ -121,7 +121,7 @@ class WB2Language {
     for (let [key, value] of this.addMap) {
       let inst = wbInstructionMap.get(value);
       let oldGotoN = inst.n;
-      let newGotoN = this.addMap.get(oldGotoN);
+      let newGotoN = this.addMap.get(oldGotoN) || 0;
       inst.n = newGotoN;
       wbInstructionMap.set(inst.number, inst);
     }
